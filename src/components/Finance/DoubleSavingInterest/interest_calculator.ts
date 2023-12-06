@@ -1,52 +1,48 @@
 export type DoubleInterestValue = {
-    start_value: number;
-    money_each_month: number;
+    start_money: number;
+    monthly_money: number;
     expected_time: number;
     interest_rate: number;
-    time_multiplier: "12" | "1" | "4";
+    cycle_type: CycleType;
 };
+type CycleType = "yearly" | "monthly" | "seasonly";
 
-function calculate_interest_money(
-    multiplier: number,
-    interest_rate: number,
-    expected_time: number,
-    start_value: number
+function calculate_base_money_interest(
+    base_money: number,
+    interest_per_cycle: number,
+    total_cycle: number
 ): number {
     // Calculate first part
-    const base = 1 + interest_rate / multiplier;
-    return start_value * Math.pow(base, expected_time * multiplier);
+    const base = 1 + interest_per_cycle;
+    return base_money * Math.pow(base, total_cycle);
 }
 
-function calculate_interest_per_month(
-    multiplier: number,
-    interest_rate: number,
-    expected_time: number,
-    money_each_month: number
+function calculate_monthly_money_interest(
+    total_cycle: number,
+    total_month_per_cycle: number,
+    interest_per_cycle: number,
+    money_per_month: number
 ): number {
-    const per_month_multiplier = convert_to_month(multiplier);
-
     let culmulative_interest = 0;
-    for (let i = 0; i < expected_time * multiplier; i++) {
-        culmulative_interest += Math.pow(1 + interest_rate / multiplier, i);
+    for (let i = 0; i < total_cycle; i++) {
+        culmulative_interest += Math.pow(1 + interest_per_cycle, i);
+        console.log(culmulative_interest);
     }
-
-    return culmulative_interest * per_month_multiplier * money_each_month;
+    return culmulative_interest * total_month_per_cycle * money_per_month;
 }
 
-function convert_to_month(time_multiplier: number): number {
+function convert_to_month(m: CycleType): number {
     let per_month_multiplier = 12;
-    switch (time_multiplier) {
-        case 1:
-            // yearly
+    switch (m) {
+        case "yearly":
             per_month_multiplier = 12;
             break;
 
-        case 4:
-            // seasonly
+        case "seasonly":
             per_month_multiplier = 3;
             break;
 
-        case 12:
+        case "monthly":
             // monthly
             per_month_multiplier = 1;
             break;
@@ -54,24 +50,42 @@ function convert_to_month(time_multiplier: number): number {
     return per_month_multiplier;
 }
 
-export function calculate_rate(values: DoubleInterestValue, iteration?: number) {
-    const interest_rate = values.interest_rate / 100;
-    const multiplier = parseInt(values.time_multiplier);
-    const expected_time = iteration ?? values.expected_time;
-    const interest_money = calculate_interest_money(
-        multiplier,
-        interest_rate,
-        expected_time,
-        values.start_value
-    );
+function get_multiplier(saving_type: CycleType) {
+    if (saving_type == "monthly") {
+        return 12;
+    }
+    if (saving_type == "seasonly") {
+        return 4;
+    }
+    if (saving_type == "yearly") {
+        return 1;
+    } else {
+        return 1;
+    }
+}
 
-    const month_amount = calculate_interest_per_month(
-        multiplier,
-        interest_rate,
-        expected_time,
-        values.money_each_month
+export function calculate_rate(values: DoubleInterestValue, iteration?: number) {
+    const r = values.interest_rate / 100;
+    const m = get_multiplier(values.cycle_type);
+    const n = iteration ?? values.expected_time;
+    const a = values.monthly_money;
+
+    const interest_per_cycle = r / m;
+    const total_cycle = n * m;
+    const month_per_cycle = convert_to_month(values.cycle_type);
+
+    const interest_money = calculate_base_money_interest(
+        values.start_money,
+        interest_per_cycle,
+        total_cycle
+    );
+    const month_amount = calculate_monthly_money_interest(
+        total_cycle,
+        month_per_cycle,
+        interest_per_cycle,
+        a
     );
 
     const final_amount = interest_money + month_amount;
-    return final_amount;
+    return Math.floor(final_amount);
 }
