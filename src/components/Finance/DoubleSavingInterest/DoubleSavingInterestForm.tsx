@@ -56,6 +56,7 @@ function DoubleSavingInterestForm({ form }: Props) {
           clampBehavior="strict"
           suffix=" Năm"
           allowNegative={false}
+          max={200}
           placeholder="VD: 1 Năm"
           leftSection={<IconCalendar stroke={1.5} />}
           defaultValue={1}

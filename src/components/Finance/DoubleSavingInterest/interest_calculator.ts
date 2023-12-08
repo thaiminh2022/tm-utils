@@ -26,7 +26,6 @@ function calculate_monthly_money_interest(
     let culmulative_interest = 0;
     for (let i = 0; i < total_cycle; i++) {
         culmulative_interest += Math.pow(1 + interest_per_cycle, i);
-        console.log(culmulative_interest);
     }
     return culmulative_interest * total_month_per_cycle * money_per_month;
 }

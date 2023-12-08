@@ -10,7 +10,8 @@ import {
 import Root from "./components/Root";
 import MathPage from "./components/MathPage";
 import { paths_information } from "./constants";
-import DoubleSavingInterest from "./components/Finance/DoubleSavingInterest/DoubleSavingInterest";
+import DoubleSavingInterest from "./components/Finance/DoubleSavingInterest";
+import NhamNghiem from "./components/MathPage/NhamNghiem";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,7 +19,7 @@ const router = createBrowserRouter(
       <Route path={paths_information.math_index.path} element={<MathPage />} />
       <Route
         path={paths_information.math_nhamnghiem.path}
-        element={<MathPage />}
+        element={<NhamNghiem />}
       />
       <Route
         path={paths_information.double_saving_interest.path}

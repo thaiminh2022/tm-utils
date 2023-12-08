@@ -7,29 +7,47 @@ import {
   Text,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DoubleInterestValue, calculate_rate } from "./interest_calculator";
 import DoubleSavingInterestForm from "./DoubleSavingInterestForm";
 import FomulaHelper from "./FomulaHelper";
-import { useElementSize, useMediaQuery } from "@mantine/hooks";
+import { useElementSize, useLocalStorage, useMediaQuery } from "@mantine/hooks";
 import { IconCalculator, IconGraph, IconTable } from "@tabler/icons-react";
 import DataTable from "./DataTable";
 import MoneyGraph from "./MoneyGraph";
 
+const default_double_interest_value: DoubleInterestValue = {
+  start_money: 0,
+  monthly_money: 0,
+  interest_rate: 0,
+  expected_time: 0,
+  cycle_type: "yearly",
+} as const;
+
 function DoubleSavingInterest() {
   const isMobile = useMediaQuery(`(max-width: 62em)`);
-
   const [final_money, set_final_money] = useState(0);
+
+  const [form_storage_value, set_form_storage_value] =
+    useLocalStorage<DoubleInterestValue>({
+      key: "double_interest_form_value",
+      defaultValue: default_double_interest_value,
+    });
+
   const form = useForm<DoubleInterestValue>({
-    initialValues: {
-      start_money: 0,
-      monthly_money: 0,
-      interest_rate: 0,
-      expected_time: 0,
-      cycle_type: "yearly",
-    },
+    initialValues: form_storage_value,
   });
+
+  useEffect(() => {
+    form.setValues(form_storage_value);
+    calculate_final_money(form_storage_value);
+  }, [form_storage_value]);
+
   function form_onSubmit(values: DoubleInterestValue) {
+    calculate_final_money(values);
+    set_form_storage_value(values);
+  }
+  function calculate_final_money(values: DoubleInterestValue) {
     let money = calculate_rate(values);
     set_final_money(money);
   }
@@ -48,7 +66,7 @@ function DoubleSavingInterest() {
     <>
       <Flex direction={isMobile ? "column" : "row"} gap="md" w="100%">
         <Stack miw="60%" gap="xs">
-          <form onSubmit={form.onSubmit(form_onSubmit)}>
+          <form onSubmit={form.onSubmit(form_onSubmit)} onReset={form.onReset}>
             <DoubleSavingInterestForm form={form} />
             <Button
               fullWidth
