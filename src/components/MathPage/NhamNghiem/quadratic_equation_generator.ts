@@ -61,7 +61,7 @@ export function get_problem(): QuadraticProblem {
   const x = get_x(multiplier, sum);
   const constant = get_constant(multiplier, product);
 
-  const eq = `${square_x}${x}${constant}`;
+  const eq = `${square_x}${x}${constant}=0`;
   let answer: QuadraticAnswerType;
 
   if (answer1 == answer2) {

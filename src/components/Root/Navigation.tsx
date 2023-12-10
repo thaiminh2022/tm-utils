@@ -1,12 +1,21 @@
 import { NavLink } from "@mantine/core";
-import React from "react";
 import { Link } from "react-router-dom";
 import { get_paths_by_category } from "../../constants";
+import { useIsMobile } from "@/hooks";
 
-type Props = {};
+type Props = {
+  toggle_burger: () => void;
+};
 
-function Navigation({}: Props) {
+function Navigation({ toggle_burger }: Props) {
   let pths = get_paths_by_category();
+  const is_mobile = useIsMobile();
+
+  function toggle_burger_when_nav_clicked() {
+    if (is_mobile) {
+      toggle_burger();
+    }
+  }
 
   return (
     <>
@@ -20,28 +29,28 @@ function Navigation({}: Props) {
             let path = paths[0].path;
             return (
               <NavLink
-                key={paths[0].id + i}
                 label={path_name}
                 component={Link}
+                key={`General - ${paths[0]}`}
                 to={path}
+                onClick={toggle_burger_when_nav_clicked}
               />
             );
           }
 
           return (
-            <>
-              <NavLink label={category} key={category + i}>
-                {paths &&
-                  paths.map((p) => (
-                    <NavLink
-                      label={p.label}
-                      key={p.id + -i}
-                      component={Link}
-                      to={p.path}
-                    />
-                  ))}
-              </NavLink>
-            </>
+            <NavLink label={category} key={category + "category"}>
+              {paths &&
+                paths.map((p) => (
+                  <NavLink
+                    label={p.label}
+                    component={Link}
+                    to={p.path}
+                    key={`${p.id}-nav`}
+                    onClick={toggle_burger_when_nav_clicked}
+                  />
+                ))}
+            </NavLink>
           );
         })}
     </>

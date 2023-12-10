@@ -6,15 +6,21 @@ import {
   Tabs,
   Text,
 } from "@mantine/core";
+
 import { useForm } from "@mantine/form";
-import { useEffect, useMemo, useState } from "react";
-import { DoubleInterestValue, calculate_rate } from "./interest_calculator";
+import { lazy, useEffect, useMemo, useState } from "react";
+import { useElementSize, useLocalStorage } from "@mantine/hooks";
+import { IconCalculator, IconGraph, IconTable } from "@tabler/icons-react";
+
+import { DoubleInterestValue, calculate_rate} from "./interest_calculator";
 import DoubleSavingInterestForm from "./DoubleSavingInterestForm";
 import FomulaHelper from "./FomulaHelper";
-import { useElementSize, useLocalStorage, useMediaQuery } from "@mantine/hooks";
-import { IconCalculator, IconGraph, IconTable } from "@tabler/icons-react";
-import DataTable from "./DataTable";
-import MoneyGraph from "./MoneyGraph";
+
+const DataTable = lazy(() => import("./DataTable"));
+const MoneyGraph = lazy(() => import("./MoneyGraph"));
+
+import { useIsMobile } from "@/hooks";
+import React from "react";
 
 const default_double_interest_value: DoubleInterestValue = {
   start_money: 0,
@@ -25,7 +31,7 @@ const default_double_interest_value: DoubleInterestValue = {
 } as const;
 
 function DoubleSavingInterest() {
-  const isMobile = useMediaQuery(`(max-width: 62em)`);
+  const is_mobile = useIsMobile();
   const [final_money, set_final_money] = useState(0);
 
   const [form_storage_value, set_form_storage_value] =
@@ -53,7 +59,8 @@ function DoubleSavingInterest() {
   }
 
   const { ref, width, height } = useElementSize();
-  const data = useMemo(() => {
+
+  const table_data = useMemo(() => {
     let data = [];
     for (let i = 1; i <= form.values.expected_time; i++) {
       const data_each_year = calculate_rate(form.values, i);
@@ -64,10 +71,10 @@ function DoubleSavingInterest() {
 
   return (
     <>
-      <Flex direction={isMobile ? "column" : "row"} gap="md" w="100%">
+      <Flex direction={is_mobile ? "column" : "row"} gap="md" w="100%">
         <Stack miw="60%" gap="xs">
           <form onSubmit={form.onSubmit(form_onSubmit)} onReset={form.onReset}>
-            <DoubleSavingInterestForm form={form} />
+            <DoubleSavingInterestForm form={form}/>
             <Button
               fullWidth
               leftSection={<IconCalculator />}
@@ -92,7 +99,7 @@ function DoubleSavingInterest() {
             </Text>
           </Text>
 
-          <Tabs>
+          <Tabs defaultValue="table">
             <Tabs.List>
               <Tabs.Tab value="graph" leftSection={<IconGraph />}>
                 Biểu đồ
@@ -102,10 +109,13 @@ function DoubleSavingInterest() {
               </Tabs.Tab>
             </Tabs.List>
             <Tabs.Panel value="graph" ref={ref}>
-              <MoneyGraph money_data={data} width={width} height={height} />
+              <React.Suspense> 
+
+              <MoneyGraph money_data={table_data} width={width} height={height} />
+              </React.Suspense>
             </Tabs.Panel>
             <Tabs.Panel value="table">
-              <DataTable data={data} />
+              <DataTable data={table_data} />
             </Tabs.Panel>
           </Tabs>
         </Stack>

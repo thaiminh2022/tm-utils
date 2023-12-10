@@ -1,5 +1,3 @@
-import React, { useMemo } from "react";
-import { DoubleInterestValue, calculate_rate } from "./interest_calculator";
 import {  Table } from "@mantine/core";
 
 type Props = {

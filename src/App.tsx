@@ -7,11 +7,15 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
-import Root from "./components/Root";
-import MathPage from "./components/MathPage";
+import { lazy } from "react";
 import { paths_information } from "./constants";
-import DoubleSavingInterest from "./components/Finance/DoubleSavingInterest";
-import NhamNghiem from "./components/MathPage/NhamNghiem";
+
+const Root = lazy(() => import("./components/Root"));
+const MathPage = lazy(() => import("./components/MathPage"));
+const DoubleSavingInterest = lazy(
+  () => import("./components/Finance/DoubleSavingInterest")
+);
+const NhamNghiem = lazy(() => import("./components/MathPage/NhamNghiem"));
 
 const router = createBrowserRouter(
   createRoutesFromElements(

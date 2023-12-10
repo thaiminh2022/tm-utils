@@ -15,6 +15,7 @@
     "@mantine/hooks": "^7.2.2",
     "@mantine/spotlight": "^7.2.2",
     "@tabler/icons-react": "^2.42.0",
+    "firebase": "^10.7.1",
     "mathjax-full": "^3.2.2",
     "mathjax-react": "^2.0.1",
     "react": "^18.2.0",
